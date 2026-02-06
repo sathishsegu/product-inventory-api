@@ -3,6 +3,7 @@ package com.inventory.service.impl;
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
 import com.inventory.entity.Product;
+import com.inventory.exception.ProductNotFoundException;
 import com.inventory.repository.ProductRepository;
 import com.inventory.service.ProductService;
 import org.springframework.stereotype.Service;
@@ -36,21 +37,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDTO getProductById(Long id) {
-        Product product = productRepository.findById(id).orElse(null);
-        if(product == null) {
-            return null;
-        }
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(
+                        "Product not found with id: " + id));
+
         return mapToResponseDTO(product);
     }
 
     @Override
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
 
-        Product existingProduct = productRepository.findById(id).orElse(null);
-
-        if(existingProduct == null) {
-            return null;
-        }
+        Product existingProduct = productRepository.findById(id)
+                        .orElseThrow(() -> new ProductNotFoundException(
+                                "Product not found with id: " + id));
 
         existingProduct.setName(dto.getName());
         existingProduct.setPrice(dto.getPrice());
@@ -62,13 +61,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean deleteProduct(Long id) {
-        if(!productRepository.existsById(id)) {
-            return false;
-        }
+    public void deleteProduct(Long id) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(
+                        "Product not found with id: " + id));
 
-        productRepository.deleteById(id);
-        return true;
+        productRepository.delete(existingProduct);
     }
 
     private Product mapToEntity(ProductRequestDTO dto) {
