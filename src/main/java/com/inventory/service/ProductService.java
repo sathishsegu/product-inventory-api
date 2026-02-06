@@ -9,7 +9,7 @@ public interface ProductService {
 
     Product createProduct(Product product);
     List<Product> getAllProducts();
-    Optional<Product> getProductById(Long id);
-    Optional<Product> updateProduct(Long id, Product updatedProduct);
-    Optional<Product> deleteProduct(Long id);
+    Product getProductById(Long id);
+    Product updateProduct(Long id, Product updatedProduct);
+    boolean deleteProduct(Long id);
 }

@@ -29,28 +29,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        return optionalProduct.orElseGet(null);
     }
 
     @Override
-    public Optional<Product> updateProduct(Long id, Product updatedProduct) {
-        return productRepository.findById(id)
-                .map(existingProduct -> {
-                    existingProduct.setName(updatedProduct.getName());
-                    existingProduct.setPrice(updatedProduct.getPrice());
-                    existingProduct.setQuantity(updatedProduct.getQuantity());
+    public Product updateProduct(Long id, Product updatedProduct) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
 
-                    return productRepository.save(existingProduct);
-                });
+        if(optionalProduct.isEmpty()) {
+            return null;
+        }
+
+        Product existingProduct = optionalProduct.get();
+
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setQuantity(updatedProduct.getQuantity());
+
+        return productRepository.save(existingProduct);
     }
 
     @Override
-    public Optional<Product> deleteProduct(Long id) {
-        return productRepository.findById(id)
-                .map(product -> {
-                    productRepository.delete(product);
-                    return product;
-                });
+    public boolean deleteProduct(Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+
+        if(optionalProduct.isEmpty()) {
+            return false;
+        }
+
+        productRepository.deleteById(id);
+        return true;
     }
 }

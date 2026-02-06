@@ -32,22 +32,31 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(product -> ResponseEntity.ok(product))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Product product = productService.getProductById(id);
+        if(product == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(product);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.updateProduct(id, product)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Product updatedProduct = productService.updateProduct(id, product);
+        if(updatedProduct == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {
-        return productService.deleteProduct(id)
-                .map(product -> ResponseEntity.noContent().build())
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        boolean deleted = productService.deleteProduct(id);
+        if(!deleted) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
