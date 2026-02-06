@@ -23,5 +23,6 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product savedProduct = productService.createProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+
     }
 }
