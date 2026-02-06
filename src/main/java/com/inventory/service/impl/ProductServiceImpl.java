@@ -1,11 +1,12 @@
 package com.inventory.service.impl;
 
+import com.inventory.dto.ProductRequestDTO;
+import com.inventory.dto.ProductResponseDTO;
 import com.inventory.entity.Product;
 import com.inventory.repository.ProductRepository;
 import com.inventory.service.ProductService;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,48 +20,72 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponseDTO createProduct(ProductRequestDTO dto) {
+        Product product = mapToEntity(dto);
+        Product savedProduct = productRepository.save(product);
+        return mapToResponseDTO(savedProduct);
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponseDTO> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
     @Override
-    public Product getProductById(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        return optionalProduct.orElse(null);
-
+    public ProductResponseDTO getProductById(Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        if(product == null) {
+            return null;
+        }
+        return mapToResponseDTO(product);
     }
 
     @Override
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+    public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
 
-        if(optionalProduct.isEmpty()) {
+        Product existingProduct = productRepository.findById(id).orElse(null);
+
+        if(existingProduct == null) {
             return null;
         }
 
-        Product existingProduct = optionalProduct.get();
+        existingProduct.setName(dto.getName());
+        existingProduct.setPrice(dto.getPrice());
+        existingProduct.setQuantity(dto.getQuantity());
 
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setQuantity(updatedProduct.getQuantity());
+        Product updatedProduct = productRepository.save(existingProduct);
 
-        return productRepository.save(existingProduct);
+        return mapToResponseDTO(updatedProduct);
     }
 
     @Override
     public boolean deleteProduct(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-
-        if(optionalProduct.isEmpty()) {
+        if(!productRepository.existsById(id)) {
             return false;
         }
 
         productRepository.deleteById(id);
         return true;
+    }
+
+    private Product mapToEntity(ProductRequestDTO dto) {
+        Product product = new Product();
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setQuantity(dto.getQuantity());
+        return product;
+    }
+
+    private ProductResponseDTO mapToResponseDTO(Product product) {
+        ProductResponseDTO dto = new ProductResponseDTO();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setQuantity(product.getQuantity());
+        dto.setCreatedAt(product.getCreatedAt());
+        return dto;
     }
 }
