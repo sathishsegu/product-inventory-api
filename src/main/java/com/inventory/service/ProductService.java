@@ -4,5 +4,5 @@ import com.inventory.entity.Product;
 
 public interface ProductService {
 
-    Product addProduct(Product product);
+    Product createProduct(Product product);
 }
