@@ -2,7 +2,6 @@ package com.inventory.controller;
 
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
-import com.inventory.entity.Product;
 import com.inventory.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

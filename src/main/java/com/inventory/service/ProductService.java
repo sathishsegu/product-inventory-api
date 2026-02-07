@@ -2,7 +2,6 @@ package com.inventory.service;
 
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
-import com.inventory.entity.Product;
 
 import java.util.List;
 

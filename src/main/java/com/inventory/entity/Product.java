@@ -22,6 +22,10 @@ public class Product {
     private Integer quantity;
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
