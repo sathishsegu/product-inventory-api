@@ -17,9 +17,12 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private Double price;
     private Integer quantity;
+
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -27,7 +30,7 @@ public class Product {
     private Category category;
 
     @PrePersist
-    public void prePersist() {
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 }

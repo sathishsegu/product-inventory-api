@@ -6,6 +6,7 @@ import com.inventory.entity.Category;
 import com.inventory.exception.CategoryNotFoundException;
 import com.inventory.repository.CategoryRepository;
 import com.inventory.service.CategoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,24 +15,28 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 
 
 
     @Override
     public CategoryResponseDTO createCategory(CategoryRequestDTO dto) {
-        Category category = mapToEntity(dto);
+        Category category = modelMapper.map(dto, Category.class);
         Category savedCategory = categoryRepository.save(category);
-        return mapToResponseDTO(savedCategory);
+        return modelMapper.map(savedCategory, CategoryResponseDTO.class);
     }
 
     @Override
     public List<CategoryResponseDTO> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categories.stream().map(this::mapToResponseDTO).toList();
+        return categoryRepository.findAll()
+                .stream()
+                .map(category -> modelMapper.map(category, CategoryResponseDTO.class))
+                .toList();
     }
 
     @Override
@@ -40,20 +45,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException(
                         "Category not found with id: " + categoryId));
 
-        return mapToResponseDTO(category);
-    }
-
-
-    private Category mapToEntity(CategoryRequestDTO dto) {
-        Category category = new Category();
-        category.setCategoryName(dto.getCategoryName());
-        return category;
-    }
-
-    private CategoryResponseDTO mapToResponseDTO(Category category) {
-        CategoryResponseDTO dto = new CategoryResponseDTO();
-        dto.setCategoryId(category.getCategoryId());
-        dto.setCategoryName(category.getCategoryName());
-        return dto;
+        return modelMapper.map(category, CategoryResponseDTO.class);
     }
 }

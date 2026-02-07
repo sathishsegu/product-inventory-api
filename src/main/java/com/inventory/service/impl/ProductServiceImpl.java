@@ -10,6 +10,7 @@ import com.inventory.exception.ProductNotFoundException;
 import com.inventory.repository.CategoryRepository;
 import com.inventory.repository.ProductRepository;
 import com.inventory.service.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,10 +20,14 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              ModelMapper modelMapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -34,21 +39,27 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new CategoryNotFoundException(
                         "Category not found with id: " + dto.getCategoryId()));
 
-        Product product = new Product();
-        product.setName(dto.getName());
-        product.setPrice(dto.getPrice());
-        product.setQuantity(dto.getQuantity());
+        Product product = modelMapper.map(dto, Product.class);
         product.setCategory(category);
 
         Product savedProduct = productRepository.save(product);
-        return mapToResponseDTO(savedProduct);
+
+        ProductResponseDTO response =  modelMapper.map(savedProduct, ProductResponseDTO.class);
+        response.setCategoryName(category.getCategoryName());
+
+        return response;
     }
 
     @Override
     public List<ProductListResponseDTO> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(this::mapToListResponseDTO)
+
+        return productRepository.findAll().stream()
+                .map(product -> {
+                    ProductListResponseDTO dto =
+                            modelMapper.map(product, ProductListResponseDTO.class);
+                dto.setCategoryName(product.getCategory().getCategoryName());
+                return dto;
+                })
                 .toList();
     }
 
@@ -58,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(
                         "Product not found with id: " + id));
 
-        return mapToResponseDTO(product);
+        return modelMapper.map(product, ProductResponseDTO.class);
     }
 
     @Override
@@ -72,14 +83,15 @@ public class ProductServiceImpl implements ProductService {
                         .orElseThrow(() -> new CategoryNotFoundException(
                                 "Category not found with id: " + dto.getCategoryId()));
 
-        existingProduct.setName(dto.getName());
-        existingProduct.setPrice(dto.getPrice());
-        existingProduct.setQuantity(dto.getQuantity());
+        modelMapper.map(dto, existingProduct);
         existingProduct.setCategory(category);
 
         Product updatedProduct = productRepository.save(existingProduct);
 
-        return mapToResponseDTO(updatedProduct);
+        ProductResponseDTO response = modelMapper.map(updatedProduct, ProductResponseDTO.class);
+        response.setCategoryName(category.getCategoryName());
+
+        return response;
     }
 
     @Override
@@ -91,29 +103,4 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(existingProduct);
     }
 
-    private Product mapToEntity(ProductRequestDTO dto) {
-        Product product = new Product();
-        product.setName(dto.getName());
-        product.setPrice(dto.getPrice());
-        product.setQuantity(dto.getQuantity());
-        return product;
-    }
-
-    private ProductResponseDTO mapToResponseDTO(Product product) {
-        ProductResponseDTO dto = new ProductResponseDTO();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setPrice(product.getPrice());
-        dto.setQuantity(product.getQuantity());
-        dto.setCreatedAt(product.getCreatedAt());
-        dto.setCategoryName(product.getCategory().getCategoryName());
-        return dto;
-    }
-
-    private ProductListResponseDTO mapToListResponseDTO(Product product) {
-        ProductListResponseDTO dto = new ProductListResponseDTO();
-        dto.setName(product.getName());
-        dto.setCategoryName(product.getCategory().getCategoryName());
-        return dto;
-    }
 }
