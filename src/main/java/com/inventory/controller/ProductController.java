@@ -1,5 +1,6 @@
 package com.inventory.controller;
 
+import com.inventory.dto.ProductListResponseDTO;
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
 import com.inventory.service.ProductService;
@@ -26,7 +27,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductListResponseDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
