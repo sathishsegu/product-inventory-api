@@ -1,5 +1,6 @@
 package com.inventory.service.impl;
 
+import com.inventory.dto.PagedResponse;
 import com.inventory.dto.ProductListResponseDTO;
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
@@ -11,6 +12,10 @@ import com.inventory.repository.CategoryRepository;
 import com.inventory.repository.ProductRepository;
 import com.inventory.service.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,16 +56,34 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductListResponseDTO> getAllProducts() {
+    public PagedResponse<ProductListResponseDTO> getAllProducts(int page, int size, String sortBy, String direction) {
 
-        return productRepository.findAll().stream()
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        List<ProductListResponseDTO> content = productPage.getContent()
+                .stream()
                 .map(product -> {
-                    ProductListResponseDTO dto =
-                            modelMapper.map(product, ProductListResponseDTO.class);
-                dto.setCategoryName(product.getCategory().getCategoryName());
-                return dto;
+                    ProductListResponseDTO dto = new ProductListResponseDTO();
+                    dto.setName(product.getName());
+                    dto.setCategoryName(product.getCategory().getCategoryName());
+                    return dto;
                 })
                 .toList();
+
+        return new PagedResponse<>(
+                content,
+                productPage.getNumber(),
+                productPage.getSize(),
+                productPage.getTotalElements(),
+                productPage.getTotalPages(),
+                productPage.isLast()
+        );
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.inventory.controller;
 
+import com.inventory.dto.PagedResponse;
 import com.inventory.dto.ProductListResponseDTO;
 import com.inventory.dto.ProductRequestDTO;
 import com.inventory.dto.ProductResponseDTO;
@@ -27,8 +28,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductListResponseDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<PagedResponse<ProductListResponseDTO>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction ) {
+
+        return ResponseEntity.ok(productService.getAllProducts(page, size, sortBy, direction));
     }
 
     @GetMapping("/{id}")
