@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: product-inventory-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 1561
+      MYSQL_DATABASE: product_inventory_api
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p1561" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  app:
+    image: product-inventory-api:v1.0
+    build: .
+    container_name: product-inventory-api
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/product_inventory_api
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1561
+    ports:
+          - "8080:8080"
+
+volumes:
+  mysql-data:

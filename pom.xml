@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.projects</groupId>
 	<artifactId>product-inventory-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>product-inventory-api</name>
 	<description>REST API for Product Inventory with all CRUD operations</description>
 	<url/>
@@ -72,6 +72,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>product-inventory-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
