@@ -17,8 +17,10 @@ The goal of this project is to demonstrate how scalable, clean, and maintainable
 - JPA relationship between Product and Category
 - Pagination and sorting for scalable data retrieval
 - ModelMapper integration to reduce boilerplate mapping code
+- Dockerized application with MySQL container
+- Easy environment setup using Docker Compose
 - Clean Git workflow with feature branches and meaningful commits
-- Stability-first engineering decisions (tooling evaluated, not forced)
+- Stability-first engineering decisions
 
 ---
 
@@ -29,6 +31,7 @@ The goal of this project is to demonstrate how scalable, clean, and maintainable
 - **Spring Data JPA**
 - **Hibernate / JPA**
 - **MySQL**
+- **Docker and Docker Compose**
 - **Maven**
 - **ModelMapper**
 - **Bean Validation (Jakarta Validation)**
@@ -44,6 +47,46 @@ controller  →  service  →  repository
                Logic
 ```
 
+---
+
+## 🐳 Docker Setup 
+Run the entire application (API + MySQL) using Docker.
+### ✅ Prerequisites
+
+- Docker installed
+- Docker Compose installed
+
+### ▶️ Run with Docker
+```bash
+git clone https://github.com/sathishsegu/product-inventory-api.git
+cd product-inventory-api
+
+docker compose up --build
+```
+### This will:
+
+- Build the Spring Boot image
+- Start MySQL container
+- Connect API to database automatically
+
+### 🛑 Stop Containers
+```bash
+docker compose down
+```
+---
+## 💻 Run Without Docker (Local Setup)
+
+1. Clone the Repository
+   ```Bash
+   git clone https://github.com/sathishsegu/product-inventory-api.git
+   ```
+2. Configure MySQL credentials in application.properties
+3. Create database manually
+4. Run the application
+```Bash
+mvn spring-boot:run
+```
+5. Test APIs using Postman 
 ---
 
 ## 📘 API Overview
@@ -119,20 +162,11 @@ Additional APIs implemented:
 
 ---
 
-## ▶️ How to Run the Project
- 1. Clone the Repository
-    `git clone https://github.com/sathishsegu/product-inventory-api.git`
- 2. Configure MySQL credentials in `application.properties`
- 3. Create the database (if not already created)
- 4. Run the Spring Boot application
- 5. Test APIs using Postman or any REST client
-
----
-
 ## 🧪 Testing
  - APIs tested using Postman
  - Both success and failure scenarios verified
  - Pagination, sorting, and validation thoroughly tested
+ - Docker environment tested
 
 --- 
 
@@ -148,6 +182,8 @@ compatibility issues with the latest Spring Framework version.
 Through this project, I gained hands-on experience in:
  - Designing production-ready REST APIs
  - Applying clean architecture principles
+ - Containerizing applications with Docker
+ - Managing services with Docker Compose
  - Handling validation and errors professionally
  - Writing scalable APIs with pagination
  - Using Git in a real project workflow
@@ -161,10 +197,3 @@ Through this project, I gained hands-on experience in:
 **Aspiring Java Backend Developer**
 
 📌 Open to backend developer opportunities
-
-
-
-
-
-
-
